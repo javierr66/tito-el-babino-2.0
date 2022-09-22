@@ -1,1 +1,64 @@
-mi primer repositorio publico
+import pyttsx3 
+import speech_recognition as sr
+import subprocess as sub
+from datetime import datetime
+import pywhatkit 
+
+engine = pyttsx3.init()
+
+voices=engine.getProperty('voices')
+
+engine.setProperty('voice',voices[0].id)
+
+engine.setProperty('rate', 120)
+
+def say(text):
+    engine.say(text)
+    engine.runAndWait()
+
+while True:
+    recognizer=sr.Recognizer()
+#activar microfono
+    with sr.Microphone() as source:
+        print('Escuchando...')
+        audio=recognizer.listen(source, phrase_time_limit=6)
+    
+    try:# si se entiende nuestra peticion entramos a la logica principal
+        comando=recognizer.recognize_google(audio, language='es-MX')
+        print(f'Creo  que dijiste "{comando}"')
+
+        comando=comando.lower()
+        comando=comando.split(' ')
+
+        if 'computadora' in comando:
+            
+            if 'abre' in comando or 'abrir' in comando or 'Abre' in comando:
+
+                sites={
+                    'google':'google.com',
+                    'youtube':'youtube.com',
+                    'instagram':'instagram.com'
+                }
+                for i in list(sites.keys()):
+                    if i in comando:
+                        sub.call(f'start Chrome.exe {sites[i]}', shell=True) # en este elegimo el navegador que vamos a ustilizar 
+                        say(f'Abriendo {i}')
+
+            elif 'hora' in comando:
+                time=datetime.now().strftime('%H:%M')
+                say(f'Son las {time}')
+            
+            if 'reproduce' in comando or 'Reproduce' in comando:
+                music= comando
+                say( f'Reproduciendo lo que pidio')
+                pywhatkit.playonyt(music )
+
+            if 'termina' in comando or 'terminar' in comando or 'termino' in comando or 'terminó' in comando or 'finalizar' in comando:
+                    say('Sesion finalizada')
+                    break
+
+    except:# si no se entiende nos da este mensaje 
+        print('no te entiendo, porfavor vuelve a intentarlo')
+
+
+
